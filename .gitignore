@@ -1,0 +1,5 @@
+*.local
+*.zwc
+*.zwc.old
+.tags
+.DS_Store

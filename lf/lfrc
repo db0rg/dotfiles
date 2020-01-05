@@ -1,0 +1,36 @@
+map zp set preview!
+map zS source ~/dotfiles/lf/lfrc
+map zE %tmux split-window -h kak ~/dotfiles/lf/lfrc
+map z1 set ratios 1
+map z2 set ratios 1:2
+map z3 set ratios 1:2:3
+
+map <c-w>l %tmux select-pane -R
+map <c-w>h %tmux select-pane -L
+map <c-w>k %tmux select-pane -U
+map <c-w>j %tmux select-pane -D
+map <c-w>- %tmux split-window -v lf
+map <c-w>| %tmux split-window -h lf
+
+map I $bat $f
+map e $kak $f
+
+map D $rm -ir $fx
+
+map gk push gg
+map gj push G
+
+set ifs "\n\t"
+
+cmd open ${{
+	plains=$(file --mime-type $fx | awk -F':[ ]+' '{if(match($2, "^text/")) print $1}')
+	other=$(file --mime-type $fx | awk -F':[ ]+' '{if(!match($2, "^text/")) print $1}')
+	if test "$plains"
+	then
+		tmux split-window -h kak $plains &
+	fi
+	if test "$other"
+	then
+		open $other &
+	fi
+}}

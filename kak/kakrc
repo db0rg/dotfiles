@@ -1,0 +1,181 @@
+# colorscheme solarized-light
+
+#Options
+set-option global startup_info_version 20190701
+
+set-option global tabstop     4
+set-option global indentwidth 0
+
+set-option global grepcmd "rg --no-heading --with-filename --line-number --column"
+
+set-option global ui_options ncurses_wheel_up_button=4
+set-option global ui_options ncurses_wheel_down_button=5
+
+#Keybindings
+##Insert mode
+map global insert <c-w> '<a-;>:exec -draft bd<ret>'
+map global insert <a-d> '<a-;><gt>'
+map global insert <c-d> '<a-;><lt>'
+
+##Goto
+map global -docstring "previous buffer" goto p <esc>:bp<ret>
+map global -docstring "next buffer" goto n <esc>:bn<ret>
+
+##User-mode
+map global -docstring "edit kakrc" user e %{<esc>:edit ~/dotfiles/kak/kakrc<ret>}
+map global -docstring "source kakrc" user s %{<esc>:source ~/dotfiles/kak/kakrc<ret>}
+
+map global -docstring "dash" user l %{<esc>:nop %sh{open "dash://$kak_selection"}<ret>}
+
+map global -docstring "search project" user 'r' %{:grep <c-r>/<ret>}
+
+##Custom pipe
+# from selection to command to info window
+declare-option -docstring "Max height of output from my-pipe and my-pipe-prompt" int my_pipe_height 30
+define-command my-pipe -params 1 -override -docstring "Pipe selection to terminal and display first my_pipe_height lines as info-box" %{
+	evaluate-commands %sh{
+		result=$(printf "%s" "${kak_selection}" | sh -c "$1" | sed '/^$/d' | head -n "${kak_opt_my_pipe_height}" | sed "s/\"/'/g")
+		# printf '%s' "${result}" > /dev/stderr
+		lines=$(printf "%s" "${result}" | wc -l)
+		if test -z "${result}"
+		then
+			printf 'echo "no output"\n'
+		else
+			printf 'info -title %%{%s} %%{%s}\n' "${kak_text}" "${result}"
+			# printf 'info -title "%s" "%s"\n' "${kak_text}" "${result}" > /dev/stderr
+		fi
+	}
+}
+
+define-command my-pipe-prompt -override -docstring "Pipe selection to terminal (prompt command) and display first my_pipe_height lines as info-box" %{
+	prompt -shell-completion "my-pipe: " %{
+		my-pipe %val{text}
+	}
+}
+map global -docstring "custom-pipe" user '!' <esc>:my-pipe-prompt<ret>
+map global -docstring "count words" user 'w' %{:my-pipe %{wc | awk '{ print "lines:",$1; print "words:",$2; print "bytes:",$3; }' }<ret>}
+
+map global -docstring "cut to pb" user x %{|pbcopy<ret>}
+map global -docstring "copy to pb" user c %{<a-|>pbcopy<ret>}
+map global -docstring "paste from pb" user v %{|pbpaste<ret>}
+
+
+##Url mappings
+try %{declare-user-mode url} #TODO allow for incomplete urls
+map global -docstring "open url" user u %{<esc>:enter-user-mode url<ret>}
+map global -docstring "default browser" url u %{:nop %sh{open "$kak_selection"}<ret>}
+map global -docstring "Google Chrome" url c %{:nop %sh{open -a "Google Chrome" "$kak_selection"}<ret>}
+map global -docstring "Safari" url s %{:nop %sh{open -a "Safari" "$kak_selection"}<ret>}
+map global -docstring "qutebrowser" url q %{:nop %sh{open -a "qutebrowser" "$kak_selection"}<ret>}
+
+
+
+#tmux integration
+define-command tmux-right -override -docstring "Open tmux pane with current kakoune session to the right of present pane" %{
+	tmux-terminal-horizontal kak -c %val{session}
+}
+
+define-command tmux-down -override -docstring "Open tmux pane with current kakoune session below the present pane" %{
+	tmux-terminal-vertical kak -c %val{session}
+}
+
+alias global tr tmux-right
+alias global td tmux-down
+
+try %{declare-user-mode tmux}
+map global -docstring "tmux-mode" normal <c-w> %{:enter-user-mode tmux<ret>}
+map global -docstring "move right" tmux l %{:nop %sh{tmux select-pane -R}<ret>}
+map global -docstring "move left" tmux h %{:nop %sh{tmux select-pane -L}<ret>}
+map global -docstring "move up" tmux k %{:nop %sh{tmux select-pane -U}<ret>}
+map global -docstring "move down" tmux j %{:nop %sh{tmux select-pane -D}<ret>}
+map global -docstring "split horizontal" tmux | :tr<ret>
+map global -docstring "split vertical" tmux <minus> :td<ret>
+map global -docstring "vertical repl" tmux r :tmux-repl-vertical<ret>
+
+map global -docstring "comment line" normal '#' :comment-line<ret>
+map global -docstring "comment block" normal <a-#> :comment-block<ret>
+
+#Styling
+declare-option -hidden bool number_lines_relative true
+define-command toggle-relative-numbers -override -docstring "Toggle whether number-lines displays relative or absolute numbers" %{
+	evaluate-commands %sh{
+		if test "${kak_opt_number_lines_relative}" = "true"
+		then
+			new="false"
+			extra=""
+		else
+			new="true"
+			extra=" -relative"
+		fi
+		echo "set-option window number_lines_relative ${new}"
+		echo "remove-highlighter window/number-lines"
+		echo "add-highlighter window/number-lines number-lines -hlcursor ${extra}"
+	}
+}
+map global -docstring "toggle relative" user '`' <esc>:toggle-relative-numbers<ret>
+
+hook global WinCreate .* %{
+	remove-highlighter window/number-lines
+	remove-highlighter window/show-matching
+	add-highlighter window/number-lines number-lines -relative -hlcursor
+	add-highlighter window/ show-matching
+}
+
+##TODOs
+remove-highlighter global/todo
+add-highlighter global/todo regex \b(TODO|FIXME|XXX|NOTE|YAH)\b 0:default+rb
+define-command next-todo -override -docstring "find next TODO FIXME XXX NOTE or YAH" %{
+	exec -save-regs / "/TODO|FIXME|XXX|NOTE|YAH<ret>"
+}
+map global -docstring "next TODO etc" user n %{:next-todo<ret>}
+define-command prev-todo -override -docstring "find previous TODO FIXME XXX NOTE or YAH" %{
+	exec -save-regs / "<a-/>TODO|FIXME|XXX|NOTE|YAH<ret>"
+}
+map global -docstring "prev TODO etc" user p %{:prev-todo<ret>}
+map global -docstring "search for TODOs" user t %{:grep TODO|FIXME|XXX|NOTE|YAH<ret>}
+
+
+#Filetypes
+hook global WinSetOption filetype=go %{
+	hook window BufWritePre .* lsp-formatting-sync
+	map window -docstring "goimports" user f %{<esc>:go-format -use-goimports<ret>}
+	map window -docstring "go vet ." user V %{:my-pipe %{go vet . 2>&1 }<ret>}
+	map window -docstring "go test ." user T %{:my-pipe %{go test . 2>&1 }<ret>}
+	map window -docstring "dash (go)" user l %{<esc>:nop %sh{open "dash://go:$kak_selection"}<ret>}
+	set-option window lintcmd golint
+}
+
+hook global WinSetOption filetype=python %{
+	map window -docstring "format" user f <esc>:format<ret>
+	map window -docstring "lint" user l <esc>:lint<ret>
+	set-option window indentwidth 4
+	set-option window formatcmd 'black --fast -l 80 -'
+	set-option window lintcmd 'pylint'
+	map window -docstring "dash (py)" user l %{<esc>:nop %sh{open "dash://py:$kak_selection"}<ret>}
+	map window insert <c-i> <space><space><space><space>
+	map window insert <tab> <space><space><space><space>
+}
+
+hook global WinSetOption filetype=sql %{
+	set-option window comment_line '--'
+ 	set-option window comment_block_begin '/*'
+ 	set-option window comment_block_end '*/'
+}
+
+#kak-lsp
+evaluate-commands %sh{
+	if test "${kak_opt_lsp_cmd}z" = "z"
+	then
+		kak-lsp --kakoune -s $kak_session -c ~/.config/kak-lsp/kak-lsp.toml
+		echo "lsp-enable"
+	else
+		echo nop
+	fi
+}
+set-option global lsp_insert_spaces false
+# set global lsp_cmd "kak-lsp -s %val{session} -vvv --log /tmp/kak-lsp.log"
+map global -docstring "lsp-mode" normal <minus> %{:enter-user-mode lsp<ret>}
+map global -docstring "rename symbol (prompt)" lsp R <esc>:lsp-rename-prompt<ret>
+map global -docstring "clear reference highlight" lsp <a-&> %{<esc>:set-face global Reference Default<ret>}
+map global -docstring "highlight references" lsp <&> %{<esc>:lsp-highlight-references<ret>:set-face global Reference MatchingChar<ret>}
+map global -docstring "restart kak-lsp" lsp ! <esc>:lsp-stop<ret>:lsp-start<ret>
