@@ -32,6 +32,12 @@ roots = ["requirements.txt", "setup.py", ".git", ".hg"]
 command = "pyls"
 offset_encoding = "utf-8"
 
+[language.r]
+filetypes = ["r"]
+roots = [".rprofile", ".git", ".hg"]
+command = "R"
+args = ["--slave", "-e", "languageserver::run()"]
+
 # [language.javascript]
 # filetypes = ["javascript"]
 # roots = ["package.json"]
