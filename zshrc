@@ -33,7 +33,7 @@ setopt nobeep
 
 export KEYTIMEOUT=1 #Don't wait for stuff after esc too long
 umask 022
-tabs -2
+tabs -4
 
 WORDCHARS='*?-.[]~=&;!#$%^(){}<>' #Back kill
 export BAT_THEME="OneHalfLight"
@@ -129,13 +129,12 @@ if [ ! $ZSH_COMPDUMP ]; then
 	zstyle '*' single-ignored show
 
 	##Prompt
-	PROMPT=$'%F{green}%U%~%u
-%F{cyan}➤%f '
+	PROMPT=`printf '%%F{green}%%U%%~%%u\n%%F{cyan}➤%%f '`
+	RPROMPT='%(?..%F{red}%?⏎%f )%*'
 	if [ -n "$TMUX" ]
 	then
 		ZLE_RPROMPT_INDENT=0
 	fi
-	RPROMPT=$'%(?..%F{red}%?⏎%f )%*'
 
 	#automatic pushd
 	setopt auto_pushd

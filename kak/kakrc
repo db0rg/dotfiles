@@ -162,6 +162,15 @@ hook global WinSetOption filetype=sql %{
  	set-option window comment_block_end '*/'
 }
 
+hook global WinSetOption filetype=man %{
+	map window -docstring "go to definition" go d %{<esc><a-a><a-w><a-;>h/[a-zA-Z-_]+(\(\d+\))?<ret>:man <c-r>.<ret>}
+}
+
+##Detection
+hook global BufCreate .*/zsh(env|rc)(.local)? %{
+    set-option buffer filetype sh
+}
+
 #kak-lsp
 evaluate-commands %sh{
 	if test "${kak_opt_lsp_cmd}z" = "z"
@@ -179,3 +188,12 @@ map global -docstring "rename symbol (prompt)" lsp R <esc>:lsp-rename-prompt<ret
 map global -docstring "clear reference highlight" lsp <a-&> %{<esc>:set-face global Reference Default<ret>}
 map global -docstring "highlight references" lsp <&> %{<esc>:lsp-highlight-references<ret>:set-face global Reference MatchingChar<ret>}
 map global -docstring "restart kak-lsp" lsp ! <esc>:lsp-stop<ret>:lsp-start<ret>
+
+#local
+evaluate-commands %sh{
+	if [ -f ~/dotfiles/kak/kakrc.local ]; then
+		echo "source '~/dotfiles/kak/kakrc.local'"
+	else
+		echo "nop"
+	fi
+}
