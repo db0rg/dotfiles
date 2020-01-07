@@ -1,7 +1,7 @@
 # colorscheme solarized-light
 
 #Options
-set-option global startup_info_version 20190701
+set-option global startup_info_version 20191210
 
 set-option global tabstop     4
 set-option global indentwidth 0
@@ -25,7 +25,7 @@ map global -docstring "next buffer" goto n <esc>:bn<ret>
 map global -docstring "edit kakrc" user e %{<esc>:edit ~/dotfiles/kak/kakrc<ret>}
 map global -docstring "source kakrc" user s %{<esc>:source ~/dotfiles/kak/kakrc<ret>}
 
-map global -docstring "dash" user l %{<esc>:nop %sh{open "dash://$kak_selection"}<ret>}
+map global -docstring "dash" user d %{<esc>:nop %sh{open "dash://$kak_selection"}<ret>}
 
 map global -docstring "search project" user 'r' %{:grep <c-r>/<ret>}
 
@@ -141,17 +141,19 @@ hook global WinSetOption filetype=go %{
 	map window -docstring "goimports" user f %{<esc>:go-format -use-goimports<ret>}
 	map window -docstring "go vet ." user V %{:my-pipe %{go vet . 2>&1 }<ret>}
 	map window -docstring "go test ." user T %{:my-pipe %{go test . 2>&1 }<ret>}
-	map window -docstring "dash (go)" user l %{<esc>:nop %sh{open "dash://go:$kak_selection"}<ret>}
+	map window -docstring "dash (go)" user d %{<esc>:nop %sh{open "dash://go:$kak_selection"}<ret>}
 	set-option window lintcmd golint
 }
 
+declare-option -hidden int python_line_width 78
+# roundabout way so value can be overriden in kakrc.local
 hook global WinSetOption filetype=python %{
 	map window -docstring "format" user f <esc>:format<ret>
 	map window -docstring "lint" user l <esc>:lint<ret>
 	set-option window indentwidth 4
-	set-option window formatcmd 'black --fast -l 80 -'
+	set-option window formatcmd %sh{ printf "black -l %d -" $kak_opt_python_line_width }
 	set-option window lintcmd 'pylint'
-	map window -docstring "dash (py)" user l %{<esc>:nop %sh{open "dash://py:$kak_selection"}<ret>}
+	map window -docstring "dash (py)" user d %{<esc>:nop %sh{open "dash://py:$kak_selection"}<ret>}
 	map window insert <c-i> <space><space><space><space>
 	map window insert <tab> <space><space><space><space>
 }
@@ -196,4 +198,7 @@ evaluate-commands %sh{
 	else
 		echo "nop"
 	fi
+}
+hook global BufCreate .*/kakrc.local %{
+	set-option buffer filetype kak
 }
