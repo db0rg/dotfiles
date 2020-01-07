@@ -30,7 +30,7 @@ function {
 
 # brews
 function {
-	local brews_to_install=(kakoune tmux ripgrep bat lf graphviz zsh-autosuggestions zsh-syntax-highlighting)
+	local brews_to_install=(kakoune tmux ripgrep bat lf graphviz zsh-autosuggestions zsh-syntax-highlighting python)
 	local brews_to_install=($brews_to_install coreutils entr exa findutils gawk go inetutils jq ul/kak-lsp/kak-lsp)
 	local brews_to_install=($brews_to_install mawk rsync sshfs stdman tldr unrar wget)
 	for brew in $brews_to_install; do
@@ -46,9 +46,17 @@ function {
 	if ! (echo 'library("languageserver")' | R --slave &> /dev/null) ; then
 		echo 'install.packages("languageserver", repos="https://cloud.r-project.org")' | R --slave
 	fi
+	if ! which go &> /dev/null; then
+		echo "Error, go not installed"
+		exit 1
+	fi
 	GO111MODULE=on go get golang.org/x/tools/gopls@latest
 	if ! which goimports &> /dev/null; then
 		go get golang.org/x/tools/cmd/goimports
+	fi
+	if ! which pip3 &> /dev/null; then
+		echo "Error, python3 not installed (no pip3)"
+		exit 1
 	fi
 	local py3_installed="$(pip3 list)"
 	local py3_install=(pylint black pyls bpython numpy jupyter pandas matplotlib seaborn sklearn)
