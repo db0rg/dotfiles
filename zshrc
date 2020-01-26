@@ -49,7 +49,7 @@ setopt histreduceblanks #Removes all unimportant blanks
 
 
 #Aliases
-alias source_config="source ~/dotfiles/zshrc"
+alias source_config="source ~/dotfiles/zshenv && source ~/dotfiles/zshrc"
 alias edit_config="kak ~/dotfiles/zshrc"
 alias grep='grep --colour=auto'
 qvim() {
