@@ -135,10 +135,41 @@ map global -docstring "prev TODO etc" user p %{:prev-todo<ret>}
 map global -docstring "search for TODOs" user t %{:grep TODO|FIXME|XXX|NOTE|YAH<ret>}
 
 
+
 #Filetypes
+## Go and gofumpt
+declare-option -hidden str go_fumpt_tmp_dir
+
+define-command -override -params ..1 go-fumpt \
+	-docstring "go-fumpt [-use-gofumports]: custom formatter for go files" %{
+	evaluate-commands %sh{
+		dir=$(mktemp -d "${TMPDIR:-/tmp}"/kak-go.XXXXXXXX)
+		printf %s\\n "set-option buffer go_fumpt_tmp_dir ${dir}"
+		printf %s\\n "evaluate-commands -no-hooks write ${dir}/buf"
+	}
+	evaluate-commands %sh{
+		dir=${kak_opt_go_fumpt_tmp_dir}
+		if [ "$1" = "-use-gofumports" ]; then
+			fmt_cmd="gofumports -srcdir '${kak_buffile}'"
+		else
+			fmt_cmd="gofumpt -s"
+		fi
+		eval "${fmt_cmd} -e -w ${dir}/buf 2> ${dir}/stderr"
+		if [ $? ]; then
+			cp ${dir}/buf "${kak_buffile}"
+		else
+			# we should report error if linting isn't active
+			printf %s\\n "echo -debug '$(cat ${dir}/stderr)'"
+		fi
+		rm -r ${dir}
+	}
+	edit!
+}
+
 hook global WinSetOption filetype=go %{
 	hook window BufWritePre .* lsp-formatting-sync
 	map window -docstring "goimports" user f %{<esc>:go-format -use-goimports<ret>}
+	map window -docstring "gofumports" user <a-f> %{<esc>:go-fumpt -use-gofumports<ret>}
 	map window -docstring "go vet ." user V %{:my-pipe %{go vet . 2>&1 }<ret>}
 	map window -docstring "go test ." user T %{:my-pipe %{go test . 2>&1 }<ret>}
 	map window -docstring "dash (go)" user d %{<esc>:nop %sh{open "dash://go:$kak_selection"}<ret>}
@@ -193,7 +224,7 @@ map global -docstring "restart kak-lsp" lsp ! <esc>:lsp-stop<ret>:lsp-start<ret>
 
 
 #fuzzy finder from https://github.com/mawww/kakoune/wiki/Fuzzy-finder
-define-command -docstring 'Invoke fzf to open a file' -params 0 fzf-edit %{
+define-command -override -docstring 'Invoke fzf to open a file' -params 0 fzf-edit %{
 	evaluate-commands %sh{
 		if [ -z "${kak_client_env_TMUX}" ]; then
 			printf 'fail "client was not started under tmux"\n'
@@ -209,7 +240,7 @@ define-command -docstring 'Invoke fzf to open a file' -params 0 fzf-edit %{
 # the original version no longer works since kak_buflist is no longer ":" separated.
 # this one works even you have single quote or newline in file names.
 
-define-command -docstring 'Invoke fzf to select a buffer' fzf-buffer %{
+define-command -override -docstring 'Invoke fzf to select a buffer' fzf-buffer %{
 	evaluate-commands %sh{
 		BUFFER=$(
 			(
