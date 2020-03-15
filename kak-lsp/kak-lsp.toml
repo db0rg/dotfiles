@@ -24,6 +24,7 @@ timeout = 1800 # seconds = 30 minutes
 filetypes = ["go"]
 roots = ["Gopkg.toml", "go.mod", ".git", ".hg"]
 command = "gopls"
+args = ["--remote=auto"]
 offset_encoding = "utf-8"
 
 [language.python]

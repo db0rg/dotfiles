@@ -12,6 +12,8 @@
 	<false/>
 	<key>AppleAntiAliasingThreshold</key>
 	<integer>1</integer>
+	<key>ApplePressAndHoldEnabled</key>
+	<false/>
 	<key>AppleScrollAnimationEnabled</key>
 	<integer>0</integer>
 	<key>AppleSmoothFixedFontsSizeThreshold</key>
@@ -26363,7 +26365,7 @@
 	<key>NSWindow Frame UKCrashReporter</key>
 	<string>80 193 592 584 0 0 1280 777 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>-1080 -130 1080 788 -1080 -130 1080 1920 </string>
+	<string>-1080 337 1080 811 -1080 -130 1080 1920 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>38 156 410 326 0 0 1280 777 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
@@ -27936,6 +27938,7 @@
 	<key>NoSyncAllAppVersions</key>
 	<array>
 		<string>3.3.6</string>
+		<string>3.3.8</string>
 		<string>3.3.1</string>
 		<string>3.3.3</string>
 		<string>3.3.5</string>
@@ -27971,7 +27974,7 @@
 	<key>NoSyncLastTipTime</key>
 	<real>493208555.93116802</real>
 	<key>NoSyncLaunchExperienceControllerRunCount</key>
-	<integer>13</integer>
+	<integer>18</integer>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile</key>
 	<true/>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile_selection</key>
@@ -28712,12 +28715,6 @@
 			</dict>
 		</array>
 	</dict>
-	<key>NoSyncSearchHistory2</key>
-	<array>
-		<string>com.apple.dock launchani 1</string>
-		<string>com.apple.dock launchani  </string>
-		<string>com.apple.dock launchanimh</string>
-	</array>
 	<key>NoSyncTimeOfFirstLaunchOfVersionWithTip</key>
 	<real>486614086.64341003</real>
 	<key>NoSyncTimeOfLastPromo</key>
@@ -28821,7 +28818,7 @@
 		</dict>
 	</dict>
 	<key>PrefsCustomFolder</key>
-	<string>/Users/devi/dotfiles/iterm2</string>
+	<string>~/dotfiles/iterm2</string>
 	<key>PromptOnQuit</key>
 	<false/>
 	<key>QuitWhenAllWindowsClosed</key>
@@ -28839,9 +28836,11 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2020-01-05T13:38:05Z</date>
+	<date>2020-02-14T06:19:14Z</date>
+	<key>SUUpdateGroupIdentifier</key>
+	<integer>3386689539</integer>
 	<key>SUUpdateRelaunchingMarker</key>
-	<false/>
+	<true/>
 	<key>SavePasteHistory</key>
 	<false/>
 	<key>Show Toolbelt</key>
@@ -28905,6 +28904,6 @@
 	<key>findRegex_iTerm</key>
 	<false/>
 	<key>iTerm Version</key>
-	<string>3.3.7</string>
+	<string>3.3.8</string>
 </dict>
 </plist>
