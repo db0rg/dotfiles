@@ -73,15 +73,21 @@ else
 fi
 
 # Use if available
-if [[ -e /usr/local/share/zsh/site-functions/ ]]; then
-	fpath=(/usr/local/share/zsh/site-functions $fpath)
-fi
-if [[ -e /usr/local/share/zsh-syntax-highlighting/ ]]; then
-	source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
-if [[ -e /usr/local/share/zsh-autosuggestions/ ]]; then
-	source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-fi
+function {
+	local installed_to=/usr/share
+	if [[ `uname` == 'Darwin' ]]; then
+		local installed_to=/usr/local/share
+		if [[ -e /usr/local/share/zsh/site-functions/ ]]; then
+			fpath=(/usr/local/share/zsh/site-functions $fpath)
+		fi
+	fi
+	if [[ -e ${installed_to}/zsh-syntax-highlighting/ ]]; then
+		source ${installed_to}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+	fi
+	if [[ -e ${installed_to}/zsh-autosuggestions/ ]]; then
+		source ${installed_to}/zsh-autosuggestions/zsh-autosuggestions.zsh
+	fi
+}
 
 #oh-my-zsh-replacement
 # ZSH_COMPDUMP is set by oh-my-zsh, so if not do replacement

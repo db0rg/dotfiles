@@ -3,6 +3,7 @@
 function {
 	local original_directory=`pwd`
 	cd
+	mkdir -p .config
 	local to_link_home=(zshrc zshenv tmux.conf)
 	local to_link_config=(kak kak-lsp lf)
 	for file in $to_link_home $to_link_config
