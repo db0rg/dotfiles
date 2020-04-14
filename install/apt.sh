@@ -2,14 +2,25 @@
 
 # packages
 function {
-	# sudo apt-get update
+	sudo apt-get update
 	local packages_to_install=(kakoune tmux ripgrep bat zsh-autosuggestions zsh-syntax-highlighting)
-	local packages_to_install=($packages_to_install golang jq entr tldr python3 python3-pip)
-	local packages_to_install=($packages_to_install curl coreutils findutils awk mawk rsync wget)
+	local packages_to_install=($packages_to_install jq entr tldr python3 python3-pip)
+	local packages_to_install=($packages_to_install curl coreutils findutils awk mawk rsync wget snapd)
 	local installed_packages=$(dpkg --get-selections | cut -f1)
 	for pkg in $packages_to_install; do
 		if [[ ! $installed_packages =~ $pkg ]]; then
 			sudo apt-get install $pkg
+		fi
+	done
+}
+
+# snap packages
+function {
+	local packages_to_install=(go)
+	local installed_packages=$(snap list | cut -f1 -d' ')
+	for pkg in $packages_to_install; do
+		if ! (echo "$installed_packages" | grep "^$pkg$" &>/dev/null); then
+			sudo snap install $pkg --classic
 		fi
 	done
 }
