@@ -25,6 +25,7 @@ filetypes = ["go"]
 roots = ["Gopkg.toml", "go.mod", ".git", ".hg"]
 command = "gopls"
 args = ["--remote=auto"]
+# args = ["--remote=auto", "--logfile=/home/devi/gopls.log"]
 offset_encoding = "utf-8"
 
 [language.python]
