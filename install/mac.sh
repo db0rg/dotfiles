@@ -15,15 +15,19 @@ function {
 		echo "Installing brew"
 		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 	fi
-	brew tap homebrew/cask-fonts
-	if [ $(brew --prefix) = /opt/homebrew ]; then
-		brew shellenv >> ${0:a:h}/../zshenv.local
-	fi
 }
+
+# outside of function to not be scoped
+if [ $(uname -m) = arm64 ]; then
+	eval "$(/opt/homebrew/bin/brew shellenv)"
+else
+	eval "(brew shellenv)"
+fi
 
 # brew casks
 function {
-	local casks_to_install=(font-firacode-nerd-font scroll-reverser dash iterm2 visual-studio-code slack)
+	brew tap homebrew/cask-fonts
+	local casks_to_install=(font-fira-code-nerd-font scroll-reverser dash iterm2 visual-studio-code slack)
 	for cask in $casks_to_install; do
 		if ! brew list --cask $cask &> /dev/null; then
 			echo "Installing brew cask: $cask"

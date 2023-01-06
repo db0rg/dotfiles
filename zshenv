@@ -1,4 +1,9 @@
 export PATH=/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:~/.bin:~/go/bin:~/.local/bin
+if [[ -e /opt/homebrew ]]; then
+	eval "$(/opt/homebrew/bin/brew shellenv)"
+else
+	eval "$(brew shellenv)"
+fi
 if [[ -e /snap/bin ]]; then
 	export PATH=/snap/bin:$PATH
 fi
