@@ -1,10 +1,12 @@
 # colorscheme solarized-light
 
 #Options
-set-option global startup_info_version 20191210
+set-option global startup_info_version 20211108
 
-set-option global tabstop     4
-set-option global indentwidth 0
+set-option global tabstop 4
+
+# uncomment to disable syntax highlighting
+# set-option global disabled_hooks '.+-highlight'
 
 set-option global grepcmd "rg --no-heading --with-filename --line-number --column"
 
@@ -14,6 +16,7 @@ set-option global ui_options ncurses_wheel_down_button=5
 #Keybindings
 ##Insert mode
 map global insert <c-w> '<a-;>:exec -draft bd<ret>'
+map global insert <c-h> '<backspace>'
 map global insert <a-d> '<a-;><gt>'
 map global insert <c-d> '<a-;><lt>'
 
@@ -66,8 +69,6 @@ map global -docstring "open url" user u %{<esc>:enter-user-mode url<ret>}
 map global -docstring "default browser" url u %{:nop %sh{open "$kak_selection"}<ret>}
 map global -docstring "Google Chrome" url c %{:nop %sh{open -a "Google Chrome" "$kak_selection"}<ret>}
 map global -docstring "Safari" url s %{:nop %sh{open -a "Safari" "$kak_selection"}<ret>}
-map global -docstring "qutebrowser" url q %{:nop %sh{open -a "qutebrowser" "$kak_selection"}<ret>}
-
 
 
 #tmux integration
@@ -91,6 +92,7 @@ map global -docstring "move down" tmux j %{:nop %sh{tmux select-pane -D}<ret>}
 map global -docstring "split horizontal" tmux | :tr<ret>
 map global -docstring "split vertical" tmux <minus> :td<ret>
 map global -docstring "vertical repl" tmux r :tmux-repl-vertical<ret>
+map global -docstring "send text" tmux s :repl-send-text<ret>
 
 map global -docstring "comment line" normal '#' :comment-line<ret>
 map global -docstring "comment block" normal <a-#> :comment-block<ret>
@@ -174,6 +176,13 @@ hook global WinSetOption filetype=go %{
 	map window -docstring "go test ." user T %{:my-pipe %{go test . 2>&1 }<ret>}
 	map window -docstring "dash (go)" user d %{<esc>:nop %sh{open "dash://go:$kak_selection"}<ret>}
 	set-option window lintcmd golint
+	set-option window lsp_insert_spaces false
+	set-option global indentwidth 0
+}
+
+hook global WinSetOption filetype=(c|cpp|objc) %{
+	set-option window lsp_insert_spaces false
+	set-option global indentwidth 0
 }
 
 declare-option -hidden int python_line_width 78
@@ -214,13 +223,13 @@ evaluate-commands %sh{
 		echo nop
 	fi
 }
-set-option global lsp_insert_spaces false
 # set global lsp_cmd "kak-lsp -s %val{session} -vvv --log /tmp/kak-lsp.log"
 map global -docstring "lsp-mode" normal <minus> %{:enter-user-mode lsp<ret>}
 map global -docstring "rename symbol (prompt)" lsp R <esc>:lsp-rename-prompt<ret>
 map global -docstring "clear reference highlight" lsp <a-&> %{<esc>:set-face global Reference Default<ret>}
 map global -docstring "highlight references" lsp <&> %{<esc>:lsp-highlight-references<ret>:set-face global Reference MatchingChar<ret>}
 map global -docstring "restart kak-lsp" lsp ! <esc>:lsp-stop<ret>:lsp-start<ret>
+map global insert <c-o> "<a-;>:lsp-snippets-select-next-placeholders<ret>"
 
 
 #fuzzy finder from https://github.com/mawww/kakoune/wiki/Fuzzy-finder

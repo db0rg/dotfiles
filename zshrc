@@ -2,26 +2,6 @@
 
 # zmodload zsh/zprof
 
-#Oh-my-zsh
-#Turned out to be too slow when I recently updated for the first time since 2015 (e55c715508)
-#Uncomment to reenable
-# ZSH=$HOME/.oh-my-zsh
-# ZSH_THEME="intheloop"
-# CASE_SENSITIVE="true" #Case sensitive completion
-# DISABLE_AUTO_UPDATE="true" #Don't check for updates automatically
-# ZSH_DISABLE_COMPFIX="true"
-# COMPLETION_WAITING_DOTS="true" #Show dots while waiting for completion
-# plugins=(colored-man-pages git command-not-found)
-# if [[ `uname` == 'Darwin' ]]; then
-# 	plugins=($plugins osx)
-# fi
-# if [[ ! -d $HOME/.oh-my-zsh ]]; then
-# 	echo "Installing Oh My Zsh"
-# 	/usr/bin/env git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
-# fi
-# source $ZSH/oh-my-zsh.sh
-# local return_status="%{$fg[red]%}%(?..%? ⏎)%{$reset_color%}"
-
 
 #Options
 
@@ -62,10 +42,6 @@ if [[ `uname` == 'Darwin' ]]; then
 	#Aliases#
 	alias vpbcopy="tee /dev/stderr | pbcopy"
 
-	# Need /usr/local/opt/python/bin/ in path to use python 3
-	# This is b'c brew installs python2 as python and python as python3
-	# Needed here instead of in zshenv due to system mangling PATH order
-	export PATH="/usr/local/opt/python/libexec/bin:$PATH"
 
 	alias ls='ls -G'
 else
@@ -74,18 +50,24 @@ fi
 
 # Use if available
 function {
-	local installed_to=/usr/share
+	local installed_to=/usr
 	if [[ `uname` == 'Darwin' ]]; then
-		local installed_to=/usr/local/share
-		if [[ -e /usr/local/share/zsh/site-functions/ ]]; then
-			fpath=(/usr/local/share/zsh/site-functions $fpath)
+		local installed_to="$(brew --prefix)"
+		if [[ -e ${installed_to}/share/zsh/site-functions/ ]]; then
+			fpath=(${installed_to}/share/zsh/site-functions $fpath)
 		fi
 	fi
-	if [[ -e ${installed_to}/zsh-syntax-highlighting/ ]]; then
-		source ${installed_to}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+	if [[ -e ${installed_to}/share/zsh-completions ]]; then
+		fpath=(${installed_to}/share/zsh-completions $fpath)
 	fi
-	if [[ -e ${installed_to}/zsh-autosuggestions/ ]]; then
-		source ${installed_to}/zsh-autosuggestions/zsh-autosuggestions.zsh
+	if [[ -e ${installed_to}/opt/zsh-fast-syntax-highlighting/ ]]; then
+		source ${installed_to}/opt/zsh-fast-syntax-highlighting/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+	fi
+	if [[ -e ${installed_to}/share/zsh-syntax-highlighting/ ]]; then
+		source ${installed_to}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+	fi
+	if [[ -e ${installed_to}/share/zsh-autosuggestions/ ]]; then
+		source ${installed_to}/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 	fi
 }
 
@@ -135,7 +117,16 @@ if [ ! $ZSH_COMPDUMP ]; then
 	zstyle '*' single-ignored show
 
 	##Prompt
-	PROMPT=`printf '%%F{green}%%U%%~%%u\n%%F{cyan}➤%%f '`
+	autoload -Uz vcs_info
+	zstyle ':vcs_info:*' enable git
+	zstyle ':vcs_info:*' check-for-changes 'true'
+	zstyle ':vcs_info:*' stagedstr '%F{green}✓%f'
+	zstyle ':vcs_info:*' unstagedstr '%F{red}✗%f'
+	zstyle ':vcs_info:*' formats ' %F{blue}%b%f %c%u'
+	zstyle ':vcs_info:*' actionformats ' %F{blue}%b%F{red}[%a]%f%c%u'
+	precmd() { vcs_info }
+	setopt prompt_subst
+	PROMPT=`printf '%%F{green}%%U%%~%%u$vcs_info_msg_0_\n%%F{cyan}➤%%f '`
 	RPROMPT='%(?..%F{red}%?⏎%f )%*'
 	if [ -n "$TMUX" ]
 	then
