@@ -62,6 +62,9 @@ function {
 	fi
 	if [[ -e ${installed_to}/opt/zsh-fast-syntax-highlighting/ ]]; then
 		source ${installed_to}/opt/zsh-fast-syntax-highlighting/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+		if [[ `uname` == 'Darwin' ]]; then
+    		FAST_HIGHLIGHT[chroma-man]=
+    	fi
 	fi
 	if [[ -e ${installed_to}/share/zsh-syntax-highlighting/ ]]; then
 		source ${installed_to}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
