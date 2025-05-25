@@ -1,5 +1,6 @@
 #!/bin/zsh
 
+# date +%M:%S.%N
 # zmodload zsh/zprof
 
 
@@ -52,7 +53,7 @@ fi
 function {
 	local installed_to=/usr
 	if [[ `uname` == 'Darwin' ]]; then
-		local installed_to="$(brew --prefix)"
+		local installed_to=/opt/homebrew
 		if [[ -e ${installed_to}/share/zsh/site-functions/ ]]; then
 			fpath=(${installed_to}/share/zsh/site-functions $fpath)
 		fi
@@ -84,6 +85,7 @@ if [ ! $ZSH_COMPDUMP ]; then
 		compinit
 		touch ${HOME}/.zcompdump
 		zcompile ${HOME}/.zcompdump
+		echo re-ran compinit
 	else
 		compinit -C
 	fi
@@ -174,26 +176,26 @@ bindkey -M viins '^e' vi-end-of-line
 bindkey -M viins '^k' kill-line
 
 
-function zle-keymap-select zle-line-init {
-	case $KEYMAP$TMUX in
-		vicmd)      print -n -- "\E]50;CursorShape=0\C-G";; # block cursor
-		vicmd/*)      print -n -- "\EPtmux;\E\E]50;CursorShape=0\C-G\E\\";; # block cursor
-		viins|main) print -n -- "\E]50;CursorShape=1\C-G";; # line cursor
-		viins/*|main/*) print -n -- "\EPtmux;\E\E]50;CursorShape=1\C-G\E\\";; # line cursor
-	esac
-	zle -R
-}
-
-zle-line-finish() {
-	case $TMUX in
-		"")      print -n -- "\E]50;CursorShape=0\C-G";; # block cursor
-		/*)      print -n -- "\EPtmux;\E\E]50;CursorShape=0\C-G\E\\";; # block cursor
-	esac
-}
-
-zle -N zle-line-init
-zle -N zle-line-finish
-zle -N zle-keymap-select
+# function zle-keymap-select zle-line-init {
+# 	case $KEYMAP$TMUX in
+# 		vicmd)      print -n -- "\E]50;CursorShape=0\C-G";; # block cursor
+# 		vicmd/*)      print -n -- "\EPtmux;\E\E]50;CursorShape=0\C-G\E\\";; # block cursor
+# 		viins|main) print -n -- "\E]50;CursorShape=1\C-G";; # line cursor
+# 		viins/*|main/*) print -n -- "\EPtmux;\E\E]50;CursorShape=1\C-G\E\\";; # line cursor
+# 	esac
+# 	zle -R
+# }
+#
+# zle-line-finish() {
+# 	case $TMUX in
+# 		"")      print -n -- "\E]50;CursorShape=0\C-G";; # block cursor
+# 		/*)      print -n -- "\EPtmux;\E\E]50;CursorShape=0\C-G\E\\";; # block cursor
+# 	esac
+# }
+#
+# zle -N zle-line-init
+# zle -N zle-line-finish
+# zle -N zle-keymap-select
 bindkey -M viins '^j' autosuggest-execute
 bindkey -M viins '^z' autosuggest-clear
 bindkey -M viins '^ ' vi-forward-word
@@ -226,3 +228,4 @@ fi
 
 # zprof
 # zmodload -u zsh/zprof
+# date +%M:%S.%N

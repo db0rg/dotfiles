@@ -7,7 +7,7 @@ fi
 if [[ -e /snap/bin ]]; then
 	export PATH=/snap/bin:$PATH
 fi
-export EDITOR=vim
+export EDITOR=nvim
 export SUDO_EDITOR="vim -Z"
 export LC_ALL=en_US.UTF-8
 if [[ -e $HOME/dotfiles/zshenv.local ]]; then
